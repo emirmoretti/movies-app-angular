@@ -4,7 +4,7 @@
         <input type="text" #movieSearchInput placeholder="buscar pelicula">
         <img src="../../../assets/search.svg" alt="search">
     </div>
-    <div *ngIf="movies.length > 0 else empty" class="container">
+    <div *ngIf="(movies$ | async) as movies; else empty" class="container">
         <app-card-movie *ngFor="let movie of movies" [movie]="movie"></app-card-movie>
     </div>
     <ng-template #empty class="emtpy">

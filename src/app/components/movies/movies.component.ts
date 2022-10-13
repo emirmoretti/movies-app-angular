@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { debounceTime, distinct, filter, fromEvent, map, switchMap, tap, Subscription } from 'rxjs';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { debounceTime, distinct, filter, fromEvent, map, switchMap, tap, Subscription, Observable } from 'rxjs';
 import { Movie } from 'src/app/interfaces/movies';
 import { MovieService } from 'src/app/services/movie.service';
 
@@ -9,18 +9,20 @@ import { MovieService } from 'src/app/services/movie.service';
   styleUrls: ['./movies.component.css']
 })
 
-export class MoviesComponent implements OnInit, OnDestroy {
+export class MoviesComponent implements OnInit {
 
   movies: Movie[] = [];
 
   @ViewChild('movieSearchInput', { static: true }) movieSearchInput!: ElementRef;
+
+  movies$!: Observable<Movie[]> // pipe async se subscribe solo
 
   movieSuscription!: Subscription;
 
   constructor(private movieServices: MovieService) { }
 
   ngOnInit(): void {
-    this.movieSuscription = fromEvent<Event>(this.movieSearchInput.nativeElement, 'keyup').pipe(
+    this.movies$ = fromEvent<Event>(this.movieSearchInput.nativeElement, 'keyup').pipe(
       map((event: Event) => {
         const searchTerm = (event.target as HTMLInputElement).value;
         return searchTerm;
@@ -30,12 +32,6 @@ export class MoviesComponent implements OnInit, OnDestroy {
       distinct(), // No se ejecuta la peticion si se vuelve a poner el mismo valor
       tap((searchTerm: string) => console.log(searchTerm)), //debugear
       switchMap((searchTerm: string) => this.movieServices.getMovies(searchTerm)),
-    ).subscribe((movies: Movie[]) => { //ahora el subscribe recibe el resultado del getMovies
-      this.movies = movies !== undefined ? movies : [];
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.movieSuscription.unsubscribe();
+    )
   }
 }
