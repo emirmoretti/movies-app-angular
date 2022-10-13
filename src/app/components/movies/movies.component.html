@@ -2,6 +2,7 @@
     <h1>Listado de peliculas</h1>
     <div class="search">
         <input type="text" #movieSearchInput placeholder="buscar pelicula">
+        <img src="../../../assets/search.svg" alt="search">
     </div>
     <div *ngIf="movies.length > 0 else empty" class="container">
         <app-card-movie *ngFor="let movie of movies" [movie]="movie"></app-card-movie>
